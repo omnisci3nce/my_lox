@@ -12,7 +12,7 @@ enum TokenType {
   COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 
   // One or two character tokens
-  BANG, BANG_EQUAL
+  BANG, BANG_EQUAL,
   EQUAL, EQUAL_EQUAL,
   GREATER, GREATER_EQUAL,
   LESS, LESS_EQUAL,
@@ -30,7 +30,7 @@ enum TokenType {
 class Token {
   type: TokenType;
   lexeme: string;
-  literal: Object,
+  literal: Object;
   line: number;
 
   constructor(type: TokenType, lexeme: string, literal: Object, line: number) {
@@ -40,20 +40,90 @@ class Token {
     this.line = line;
   }
 
-  toString() {
-    // fill
+  public toString(): string {
+    return this.type + ' ' + this.lexeme + ' ' + this.literal;
   }
 }
 
 class Scanner {
-  source: string;
+  private source: string;
+  private tokens: Token[] = [];
+  private start = 0;
+  private current = 0;
+  private line = 1;
 
   constructor(source: string) {
     this.source = source;
   }
 
-  scanTokens() : Token[] {
-    return [];
+  public scanTokens() : Token[] {
+    while (!this.isAtEnd()) {
+      // beginning of the next lexeme
+      this.start = this.current;
+      this.scanToken();
+    }
+
+    this.tokens.push(new Token(TokenType.EOF, '', null, this.line));
+    return this.tokens;
+  }
+
+  private isAtEnd(): boolean {
+    return this.current >= this.source.length;
+  }
+
+  private scanToken(): void {
+    let c = this.advance();
+    switch (c) {
+      case '(': { this.addToken(TokenType.LEFT_PAREN); break; }
+      case ')': { this.addToken(TokenType.RIGHT_PAREN); break; }
+      case '{': { this.addToken(TokenType.LEFT_BRACE); break; }
+      case '}': { this.addToken(TokenType.RIGHT_BRACE); break; }
+      case ',': { this.addToken(TokenType.COMMA); break; }
+      case '.': { this.addToken(TokenType.DOT); break; }
+      case '-': { this.addToken(TokenType.MINUS); break; }
+      case '+': { this.addToken(TokenType.PLUS); break; }
+      case ';': { this.addToken(TokenType.SEMICOLON); break; }
+      case '*': { this.addToken(TokenType.STAR); break; }
+      case '!': {
+        this.addToken(this.match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+        break;
+      }
+      case '=': {
+        this.addToken(this.match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+        break;
+      }
+      case '<': {
+        this.addToken(this.match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+        break;
+      }
+      case '>': {
+        this.addToken(this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+        break;
+      }
+      default: {
+        Lox.error(this.line, "Unexpected character.");
+      }
+    }
+  }
+  private match(expected: string): boolean {
+    if (this.isAtEnd()) return false;
+    if (this.source[this.current] !== expected) return false;
+
+    this.current++;
+    return true;
+  }
+
+  private advance(): string {
+    return this.source[this.current++];
+  }
+
+  private addToken(type: TokenType, literal?: Object | null): void {
+    const text = this.source.substring(this.start, this.current);
+    if (literal) {
+      this.tokens.push(new Token(type, text, literal, this.line));
+    } else {
+      this.tokens.push(new Token(type, text, null, this.line));
+    }
   }
 }
 
@@ -83,7 +153,7 @@ class Lox {
       process.exit(64);
     }
 
-    run(source);
+    this.run(source);
   }
 
   private static runPrompt() : void {}
