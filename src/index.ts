@@ -84,6 +84,16 @@ class Scanner {
       case '+': { this.addToken(TokenType.PLUS); break; }
       case ';': { this.addToken(TokenType.SEMICOLON); break; }
       case '*': { this.addToken(TokenType.STAR); break; }
+      case '/': {
+        if (this.match('/')) {
+          while (this.peek() !== '\n' && !this.isAtEnd()) {
+            this.advance();
+          }
+        } else {
+          this.addToken(TokenType.SLASH);
+        }
+        break;
+      }
       case '!': {
         this.addToken(this.match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
         break;
@@ -115,6 +125,11 @@ class Scanner {
 
   private advance(): string {
     return this.source[this.current++];
+  }
+
+  private peek(): string { // lookahead
+    if (this.isAtEnd()) return '\0';
+    return this.source[this.current];
   }
 
   private addToken(type: TokenType, literal?: Object | null): void {
