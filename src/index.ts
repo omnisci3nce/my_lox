@@ -110,6 +110,17 @@ class Scanner {
         this.addToken(this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
         break;
       }
+      case ' ':
+      case '\r':
+      case '\t': {
+        // ignore whitespace
+        break;
+      }
+      case '\n': {
+        this.line++;
+        break;
+      }
+      case '"': this.string(); break;
       default: {
         Lox.error(this.line, "Unexpected character.");
       }
@@ -139,6 +150,25 @@ class Scanner {
     } else {
       this.tokens.push(new Token(type, text, null, this.line));
     }
+  }
+
+  private string() {
+    // continue until closing double quote or end of line
+    while (this.peek() !== '"' && !this.isAtEnd()) {
+      if (this.peek() === '\n') this.line++;
+      this.advance();
+    }
+
+    if (this.isAtEnd()) {
+      Lox.error(this.line, 'Unterminated string.');
+      return;
+    }
+
+    // the closing double quote
+    this.advance();
+
+    const value: String = this.source.substring(this.start + 1, this.current - 1);
+    this.addToken(TokenType.STRING, value);
   }
 }
 
