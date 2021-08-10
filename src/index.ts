@@ -1,10 +1,14 @@
 import * as fs from 'fs';
 import { createInterface } from 'readline';
+const readlineSync = require('readline-sync');
 
-const readline = createInterface({
+/*
+ * const readline = createInterface({
   input: process.stdin,
   output: process.stdout
 });
+*/
+
 
 enum TokenType {
   // Single-character tokens
@@ -44,6 +48,24 @@ class Token {
     return this.type + ' ' + this.lexeme + ' ' + this.literal;
   }
 }
+
+const keywords = new Map<String, TokenType>();
+keywords.set("and", TokenType.AND);
+keywords.set("class", TokenType.CLASS);
+keywords.set("else", TokenType.ELSE);
+keywords.set("false", TokenType.FALSE);
+keywords.set("for", TokenType.FOR);
+keywords.set("fun", TokenType.FUN);
+keywords.set("if", TokenType.IF);
+keywords.set("nil", TokenType.NIL);
+keywords.set("or", TokenType.OR);
+keywords.set("print", TokenType.PRINT);
+keywords.set("return", TokenType.RETURN);
+keywords.set("super", TokenType.SUPER);
+keywords.set("this", TokenType.THIS);
+keywords.set("true", TokenType.TRUE);
+keywords.set("var", TokenType.VAR);
+keywords.set("while", TokenType.WHILE);
 
 class Scanner {
   private source: string;
@@ -140,7 +162,7 @@ class Scanner {
     return true;
   }
 
-  private advance(): string {
+  private advance(): string { // returns next character and moves current forward by one
     return this.source[this.current++];
   }
 
@@ -213,7 +235,13 @@ class Scanner {
       this.advance();
     }
 
-    this.addToken(TokenType.IDENTIFIER);
+    const text = this.source.substring(this.start, this.current);
+    var tType = keywords.get(text);
+    if (!tType) {
+      tType = TokenType.IDENTIFIER;
+    }
+
+    this.addToken(tType);
   }
 }
 
@@ -246,7 +274,13 @@ class Lox {
     this.run(source);
   }
 
-  private static runPrompt() : void {}
+  private static runPrompt() : void {
+    while (true) {
+      const line = readlineSync.question('> ');
+      if (!line) break;
+      this.run(line);
+    }
+  }
 
   private static run(source: string) {
     const scanner = new Scanner(source);
@@ -254,7 +288,8 @@ class Lox {
 
     // print tokens
     tokens.forEach((token: Token) => {
-      console.log(token);
+      process.stdout.write(TokenType[token.type]);
+      console.log(' ', token);
     });
   }
 
