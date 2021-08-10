@@ -124,6 +124,8 @@ class Scanner {
       default: {
         if (this.isDigit(c)) {
           this.number();
+        } else if (this.isAlpha(c)) {
+          this.identifier();
         } else {
           Lox.error(this.line, "Unexpected character.");
         }
@@ -196,6 +198,22 @@ class Scanner {
     }
 
     this.addToken(TokenType.NUMBER, parseFloat(this.source.substring(this.start, this.current)));
+  }
+
+  private isAlpha(c: string): boolean {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+            c === '_';
+  }
+  private isAlphaNumeric(c: string): boolean {
+    return this.isAlpha(c) || this.isDigit(c);
+  }
+  private identifier() {
+    while (this.isAlphaNumeric(this.peek())) {
+      this.advance();
+    }
+
+    this.addToken(TokenType.IDENTIFIER);
   }
 }
 
