@@ -30,10 +30,10 @@ enum TokenType {
 class Token {
   type: TokenType;
   lexeme: string;
-  literal: Object;
+  literal: Object | null;
   line: number;
 
-  constructor(type: TokenType, lexeme: string, literal: Object, line: number) {
+  constructor(type: TokenType, lexeme: string, literal: Object | null, line: number) {
     this.type = type;
     this.lexeme = lexeme;
     this.literal = literal;
@@ -122,7 +122,11 @@ class Scanner {
       }
       case '"': this.string(); break;
       default: {
-        Lox.error(this.line, "Unexpected character.");
+        if (this.isDigit(c)) {
+          this.number();
+        } else {
+          Lox.error(this.line, "Unexpected character.");
+        }
       }
     }
   }
@@ -142,6 +146,10 @@ class Scanner {
     if (this.isAtEnd()) return '\0';
     return this.source[this.current];
   }
+  private peekNext(): string {
+    if (this.current + 1 >= this.source.length) return '\0';
+    return this.source[this.current + 1];
+  }
 
   private addToken(type: TokenType, literal?: Object | null): void {
     const text = this.source.substring(this.start, this.current);
@@ -152,7 +160,7 @@ class Scanner {
     }
   }
 
-  private string() {
+  private string() { // handle string literals
     // continue until closing double quote or end of line
     while (this.peek() !== '"' && !this.isAtEnd()) {
       if (this.peek() === '\n') this.line++;
@@ -169,6 +177,25 @@ class Scanner {
 
     const value: String = this.source.substring(this.start + 1, this.current - 1);
     this.addToken(TokenType.STRING, value);
+  }
+
+  private isDigit(c: string) {
+    return c >= '0' && c <= '9';
+  }
+  private number() { // handle number literals
+    while (this.isDigit(this.peek())) {
+      this.advance();
+    }
+
+    // look for fractional component
+    if (this.peek() === '.' && this.isDigit(this.peekNext())) {
+      this.advance();
+      while (this.isDigit(this.peek())) {
+        this.advance();
+      }
+    }
+
+    this.addToken(TokenType.NUMBER, parseFloat(this.source.substring(this.start, this.current)));
   }
 }
 
