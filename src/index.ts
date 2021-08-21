@@ -1,14 +1,7 @@
 import * as fs from 'fs';
 import { createInterface } from 'readline';
 const readlineSync = require('readline-sync');
-
-/*
- * const readline = createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-*/
-
+import { Binary } from './Expr'
 
 enum TokenType {
   // Single-character tokens
@@ -31,7 +24,7 @@ enum TokenType {
   EOF
 };
 
-class Token {
+export class Token {
   type: TokenType;
   lexeme: string;
   literal: Object | null;
