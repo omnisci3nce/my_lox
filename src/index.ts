@@ -3,7 +3,7 @@ import { createInterface } from 'readline';
 const readlineSync = require('readline-sync');
 import { Binary } from './Expr'
 
-enum TokenType {
+export enum TokenType {
   // Single-character tokens
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
   COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
@@ -296,4 +296,4 @@ class Lox {
   }
 }
 
-Lox.main(process.argv.slice(3));
+// Lox.main(process.argv.slice(3));
