@@ -1,4 +1,4 @@
-import { Token } from './index'
+import { Token } from './Lexer';
 
 export interface Visitor<R> {
   visitLiteralExpr(expr: Literal): R;

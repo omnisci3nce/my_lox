@@ -1,4 +1,4 @@
-import { Token, TokenType } from '.';
+import { Token, TokenType } from './Lexer';
 import { Expr, Visitor, Binary, Literal, Grouping, Unary } from './Expr'
 
 export default class AstPrinter implements Visitor<string> {
@@ -24,7 +24,6 @@ export default class AstPrinter implements Visitor<string> {
 
   private parenthesise(name: string, subExpressions: Expr[]): string {
     let str = "";
-
 
     // TODO: make it more declarative
     str += '(';
