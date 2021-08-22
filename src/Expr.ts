@@ -7,12 +7,6 @@ export interface Visitor<R> {
   visitGroupingExpr(expr: Grouping): R;
 }
 
-// class Visitor implements IVisitor<string> {
-//   public visitBinary(expr: Binary): any {
-//     return true
-//   }
-// }
-
 export abstract class Expr {
   public abstract accept<R>(visitor: Visitor<R>): R;
 }
@@ -55,3 +49,11 @@ export class Grouping extends Expr {
     return visitor.visitGroupingExpr(this);
   }
 }
+
+// class Visitor implements IVisitor<string> {
+//   public visitBinary(expr: Binary): any {
+//     return true
+//   }
+// }
+
+
