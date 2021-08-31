@@ -1,4 +1,4 @@
-import { Expr, Binary, Literal, Grouping } from './Expr';
+import { Expr, Binary, Unary, Literal, Grouping } from './Expr';
 import { Token, TokenType } from './Lexer';
 
 export class Parser {
@@ -92,7 +92,7 @@ export class Parser {
     }
   }
 
-  
+  private consume(tokenType: TokenType, )
 
   private match(tokenTypes: TokenType[]): boolean {
     let matched = false;
