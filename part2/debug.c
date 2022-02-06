@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "value.h"
 
 void disassembleChunk(Chunk* chunk, const char* name) {
   printf("== %s ==\n", name);
@@ -11,7 +12,11 @@ void disassembleChunk(Chunk* chunk, const char* name) {
 }
 
 static int constantInstruction(const char* name, Chunk* chunk, int offset) {
-  
+  uint8_t constant = chunk->code[offset + 1];
+  printf("%-16s %4d '", name, constant);
+  printValue(chunk->constants.values[constant]);
+  printf("'\n");
+  return offset + 2; // Constant instruction is two bytes so we advance the offset by two.
 }
 
 static int simpleInstruction(const char* name, int offset) {
